@@ -7,6 +7,7 @@
       로그인 | EnjoyTrip
     </title>
     <link rel="icon" href="./assets/icons/pin.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/vendor/bootstrap.min.css">
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/members.css">
   </head>
@@ -57,12 +58,7 @@
         </div>
       </div>
     </header>
-    <div class="preview-notice">
-      <div class="container">
-        화면 레퍼런스 · 검색, 저장, 로그인, 지도 기능 연결 전
-      </div>
-    </div>
-    <main id="main" class="container">
+<main id="main" class="container">
       <div class="page-heading">
         <span class="eyebrow">
           WELCOME BACK
@@ -82,7 +78,7 @@
           </p>
         </aside>
         <div class="stack">
-          <section class="panel" aria-labelledby="login-title">
+          <section class="panel shadow-sm" aria-labelledby="login-title">
             <h2 id="login-title">
               로그인
             </h2>
@@ -91,13 +87,13 @@
                 <label for="user-id">
                   아이디
                 </label>
-                <input id="user-id" name="user-id" type="text" required autocomplete="username">
+                <input class="form-control" id="user-id" name="user-id" type="text" required autocomplete="username">
               </div>
               <div class="field">
                 <label for="password">
                   데모 비밀번호
                 </label>
-                <input id="password" name="password" type="password" required autocomplete="current-password">
+                <input class="form-control" id="password" name="password" type="password" required autocomplete="current-password">
               </div>
               <p class="hint" role="status" aria-live="polite">
               </p>
@@ -114,37 +110,37 @@
               </div>
             </form>
           </section>
-          <!-- <section id="recover" class="panel" aria-labelledby="recover-title">
+          <section id="recover" class="panel shadow-sm" aria-labelledby="recover-title">
             <h2 id="recover-title">
               데모 비밀번호 재설정
             </h2>
             <p class="hint">
               실제 이메일을 발송하지 않는 학습용 흐름입니다.
             </p>
-            <form id="recover-form" class="member-form" data-preview-form>
+            <form id="recover-form" class="member-form">
               <div class="field">
                 <label for="recover-id">
                   아이디
                 </label>
-                <input id="recover-id" name="recover-id" type="text" required>
+                <input class="form-control" id="recover-id" name="recover-id" type="text" required>
               </div>
               <div class="field">
                 <label for="recover-email">
                   가입한 샘플 이메일
                 </label>
-                <input id="recover-email" name="recover-email" type="email" required>
+                <input class="form-control" id="recover-email" name="recover-email" type="email" required>
               </div>
               <div class="field">
                 <label for="new-password">
                   새 데모 비밀번호
                 </label>
-                <input id="new-password" name="new-password" type="password" required minlength="8" autocomplete="new-password">
+                <input class="form-control" id="new-password" name="new-password" type="password" required minlength="8" autocomplete="new-password">
               </div>
               <div class="field">
                 <label for="new-password-confirm">
                   새 데모 비밀번호 확인
                 </label>
-                <input id="new-password-confirm" name="new-password-confirm" type="password" required minlength="8" autocomplete="new-password">
+                <input class="form-control" id="new-password-confirm" name="new-password-confirm" type="password" required minlength="8" autocomplete="new-password">
               </div>
               <p class="hint" role="status" aria-live="polite">
               </p>
@@ -152,7 +148,7 @@
                 재설정하기
               </button>
             </form>
-          </section> -->
+          </section>
         </div>
       </div>
     </main>
@@ -162,13 +158,11 @@
           EnjoyTrip · 우리 손으로 만드는 여행
         </p>
         <p>
-          일러스트와 데이터는 학습용 샘플입니다.
+          관광 정보: 한국관광공사 · 회원·일정: 브라우저 Storage
         </p>
       </div>
     </footer>
-    <script type="module" src="./js/preview.js">
-    </script>
-    <script type="module" src="./js/common.js">
+<script type="module" src="./js/common.js">
     </script>
     <script type="module" src="./js/members.js">
     </script>

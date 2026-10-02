@@ -1,76 +1,114 @@
-// 담당 A — F104. 여행 계획 CRUD와 배열 순서 변경을 직접 구현합니다.
-// 1. session.js의 getCurrentUser()로 로그인 회원을 확인한다.
-// 2. 관광지 검색 결과에서 선택한 attractionId를 임시 일정 배열에 추가한다.
-// 3. 일자/시간/경비/메모를 입력하고 선택 순서대로 화면에 표시한다.
-// 4. 위/아래 버튼으로 배열 순서를 바꾼다. drag/drop은 3시간 이후 확장이다.
-// 5. 회원 ID와 함께 localStorage에 저장하고 새로고침 뒤 다시 불러온다.
-// 6. 회원당 1개 계획만 저장하고 불러오기/덮어쓰기/삭제를 연결한다.
-// 수도코드와 데이터 계약은 docs/TEAM_ROLES.md 및 docs/DATA_CONTRACT.md 참고.
-
-import { loadAttractions } from "./data.js";
-
+// medAndro의 중복 병합·목록 표시를 기반으로 AI가 편집·저장·복원·드래그앤드롭을 완성했습니다.
+import { getAttraction } from "./data.js";
+import { readArray, writeJSON } from "./storage.js";
+import { getCurrentUser } from "./session.js";
+import { STORAGE_KEYS } from "./config.js";
+import { createMap } from "./map.js";
+import { KAKAO_MAP_KEY } from "./settings.js";
+import { element, status } from "./ui.js";
+const form = document.querySelector("#plan-form"), list = document.querySelector("#schedule-list"), message = form.querySelector('[role="status"]');
+let user, plan, controller, draggedId;
+const places = new Map();
 init();
-
 async function init() {
-    try {
-        const attractions = await loadAttractions();
-        // TODO(B 통합): getCurrentUser()로 회원을 확인하고 readJSON()으로 planDraft를 읽어 임시 ID를 교체합니다.
-        const sampleIds = ["sample-1-12", "sample-6-12"];
-        // TODO(B 통합): 현재 회원의 저장 계획에서 items를 가져와 아래 임시 기존 일정을 교체합니다.
-        // 초안을 합친 결과를 저장한 뒤 반영한 초안을 정리합니다. 저장 실패 시 초안을 지우지 않습니다.
-        const items = [
-            {
-                attractionId: "sample-1-12",
-                visitDate: "2026-10-03",
-                visitTime: "10:00",
-                cost: 10000,
-                memo: "기존 메모"
-            }
-        ];
-        document.querySelector("#schedule-list").replaceChildren();
-
-        sampleIds.forEach(sampleId => {
-            const attr = attractions.find(attr => sampleId === attr.id);
-            if (attr) {
-                if (items.some(item => item.attractionId === sampleId)) {
-                    return;
-                }
-                if (items.length >= 5) {
-                    return;
-                }
-
-                items.push({
-                    attractionId: attr.id,
-                    visitDate: "",
-                    visitTime: "",
-                    cost: 0,
-                    memo: ""
-                })
-
-
-                console.log(attr.name);
-            }
-
-        })
-        console.log(items);
-        items.forEach(item => {
-            const attr = attractions.find(attr => item.attractionId === attr.id);
-            if (!attr) {
-                return;
-            }
-            const card = document.createElement("li");
-            card.classList.add("schedule-item");
-            const title = document.createElement("h3");
-            title.textContent = attr.name;
-
-            card.append(title);
-            document.querySelector("#schedule-list").append(card);
-        })
-    } catch (e) {
-        console.log(e);
-        alert("관광지 조회에 실패했습니다");
+  list.replaceChildren();
+  try {
+    user = getCurrentUser();
+    if (!user) { form.querySelectorAll("input, textarea, button").forEach(node => { node.disabled = true; }); status(message, "로그인 후 여행 계획을 이용해주세요.", true); return; }
+    const saved = readArray(localStorage, STORAGE_KEYS.plans).find(item => item.ownerId === user.id);
+    plan = saved || { ownerId: user.id, title: "", startDate: "", endDate: "", memo: "", items: [] };
+    if (!Array.isArray(plan.items)) throw new Error("일정 데이터 형식이 올바르지 않습니다.");
+    for (const item of plan.items) { const place = item.place || await getAttraction(item.attractionId); if (place) places.set(item.attractionId, place); }
+    const draft = readArray(sessionStorage, STORAGE_KEYS.planDraft), remaining = [];
+    let added = 0;
+    for (const id of draft) {
+      if (plan.items.some(item => item.attractionId === id)) continue;
+      if (plan.items.length >= 5) { remaining.push(id); continue; }
+      const place = await getAttraction(id); if (!place) throw new Error("초안 관광지를 찾지 못했습니다.");
+      places.set(id, place); plan.items.push({ attractionId: id, visitDate: "", visitTime: "", cost: 0, memo: "", place }); added++;
     }
-
-
-
+    if (draft.length) {
+      // 먼저 회원 계획을 저장한 뒤 초안을 소비합니다. 실패하면 초안은 남습니다.
+      persist();
+      if (remaining.length) writeJSON(sessionStorage, STORAGE_KEYS.planDraft, remaining);
+      else sessionStorage.removeItem(STORAGE_KEYS.planDraft);
+    }
+    setForm(); bindEvents(); render();
+    status(message, remaining.length ? "일정은 최대 5개입니다. 미반영 관광지는 초안에 남겨두었습니다." : added ? `${added}개 관광지를 추가했습니다. 날짜·경비를 입력하고 저장하세요.` : "일정을 편집한 뒤 여행 저장을 눌러주세요.");
+    controller = await createMap(document.querySelector("#plan-map"), { key: KAKAO_MAP_KEY }); renderMap();
+  } catch (error) { status(message, error.message, true); }
+}
+function persist() {
+  if (getCurrentUser()?.id !== user.id) throw new Error("로그인 상태가 변경되었습니다. 다시 로그인해주세요.");
+  const plans = readArray(localStorage, STORAGE_KEYS.plans);
+  const next = plans.filter(item => item.ownerId !== user.id); next.push(plan); writeJSON(localStorage, STORAGE_KEYS.plans, next);
+}
+function setForm() {
+  for (const [id, key] of [["plan-title", "title"], ["start-date", "startDate"], ["end-date", "endDate"], ["plan-memo", "memo"]]) form.querySelector(`#${id}`).value = plan[key] || "";
+}
+function readForm() {
+  plan.title = form.querySelector("#plan-title").value.trim(); plan.startDate = form.querySelector("#start-date").value; plan.endDate = form.querySelector("#end-date").value; plan.memo = form.querySelector("#plan-memo").value.trim();
+}
+function validate() {
+  if (!plan.title || !plan.startDate || !plan.endDate) throw new Error("여행 제목과 기간을 입력해주세요.");
+  if (plan.startDate > plan.endDate) throw new Error("시작일은 종료일보다 늦을 수 없습니다.");
+  if (!plan.items.length) throw new Error("관광지를 하나 이상 추가해주세요.");
+  for (const item of plan.items) {
+    if (!item.visitDate || item.visitDate < plan.startDate || item.visitDate > plan.endDate) throw new Error("모든 방문일을 여행 기간 안으로 입력해주세요.");
+    if (!Number.isFinite(item.cost) || item.cost < 0) throw new Error("경비는 0 이상의 숫자로 입력해주세요.");
+  }
+}
+function render() {
+  list.replaceChildren();
+  if (!plan.items.length) list.append(element("li", "여행지 탐색에서 관광지를 추가하세요.", "empty-state"));
+  plan.items.forEach((item, index) => {
+    const card = element("li", "", "schedule-item"); card.dataset.id = item.attractionId;
+    const handle = element("span", `${index + 1}번째 방문 · 끌어서 순서 변경`, "badge drag-handle");
+    handle.draggable = true; handle.title = "이 영역을 다른 방문의 순서 표시로 끌어 순서를 변경하세요.";
+    card.append(handle, element("h3", places.get(item.attractionId)?.name || "관광지"));
+    const fields = element("div", "", "form-grid");
+    for (const [key, label, type] of [["visitDate", "방문일", "date"], ["visitTime", "방문 시간", "time"], ["cost", "예상 경비 (원)", "number"], ["memo", "방문 메모", "text"]]) {
+      const field = element("div", "", "field"), input = document.createElement("input"), labelNode = element("label", label);
+      input.id = `${key}-${index}`; labelNode.htmlFor = input.id; input.type = type; input.value = item[key]; input.dataset.field = key;
+      if (key === "cost") { input.min = "0"; input.step = "1"; } if (key === "memo") input.maxLength = 200;
+      field.append(labelNode, input); fields.append(field);
+    }
+    card.append(fields); const actions = element("div", "", "actions section");
+    for (const [action, label] of [["up", "위로"], ["down", "아래로"], ["remove", "제외"]]) {
+      const button = element("button", label, "secondary"); button.type = "button"; button.dataset.action = action;
+      button.disabled = action === "up" && index === 0 || action === "down" && index === plan.items.length - 1;
+      actions.append(button);
+    }
+    card.append(actions); list.append(card);
+  });
+  updateTotal(); renderMap();
+  document.querySelector("#delete-plan").disabled = false;
+  document.querySelector("#saved-plan-list").replaceChildren(element("li", plan.title || "편집 중인 여행", "place-card"));
+}
+function updateTotal() { document.querySelector("#total-cost").textContent = `${plan.items.reduce((sum, item) => sum + (Number.isFinite(item.cost) ? item.cost : 0), 0).toLocaleString()}원`; }
+function renderMap() {
+  const route = plan.items.map(item => places.get(item.attractionId)).filter(Boolean);
+  controller?.updatePlaces(route); controller?.drawRoute(route);
+}
+function move(from, to) { if (from < 0 || to < 0 || to >= plan.items.length) return; const [item] = plan.items.splice(from, 1); plan.items.splice(to, 0, item); render(); }
+function bindEvents() {
+  form.addEventListener("submit", event => { event.preventDefault(); try { readForm(); validate(); persist(); render(); status(message, "여행 계획을 저장했습니다."); } catch (error) { status(message, error.message, true); } });
+  list.addEventListener("input", event => {
+    const input = event.target.closest('[data-field]'); if (!input) return;
+    const item = plan.items.find(item => item.attractionId === input.closest('[data-id]').dataset.id);
+    item[input.dataset.field] = input.dataset.field === "cost" ? (input.value === "" ? NaN : Number(input.value)) : input.value; updateTotal();
+  });
+  list.addEventListener("click", event => {
+    const button = event.target.closest('[data-action]'); if (!button) return;
+    const index = plan.items.findIndex(item => item.attractionId === button.closest('[data-id]').dataset.id);
+    if (button.dataset.action === "remove") { plan.items.splice(index, 1); render(); }
+    else move(index, index + (button.dataset.action === "up" ? -1 : 1));
+  });
+  list.addEventListener("dragstart", event => { const card = event.target.closest('[data-id]'); if (!card || event.target.matches("input")) { event.preventDefault(); return; } draggedId = card.dataset.id; event.dataTransfer.setData("text/plain", draggedId); });
+  list.addEventListener("dragover", event => { if (event.target.closest('[data-id]')) event.preventDefault(); });
+  list.addEventListener("drop", event => { event.preventDefault(); const target = event.target.closest('[data-id]'); if (target && draggedId) move(plan.items.findIndex(item => item.attractionId === draggedId), plan.items.findIndex(item => item.attractionId === target.dataset.id)); draggedId = null; });
+  document.querySelector("#delete-plan").addEventListener("click", () => {
+    if (!confirm("현재 회원의 여행 계획을 삭제할까요?")) return;
+    try { if (getCurrentUser()?.id !== user.id) throw new Error("로그인 상태를 확인해주세요."); writeJSON(localStorage, STORAGE_KEYS.plans, readArray(localStorage, STORAGE_KEYS.plans).filter(item => item.ownerId !== user.id)); sessionStorage.removeItem(STORAGE_KEYS.planDraft); plan = { ownerId: user.id, title: "", startDate: "", endDate: "", memo: "", items: [] }; setForm(); render(); status(message, "여행 계획을 삭제했습니다."); } catch (error) { status(message, error.message, true); }
+  });
 }

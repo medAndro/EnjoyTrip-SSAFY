@@ -1,6 +1,6 @@
 // AI 제공: 파일 간 합의가 필요한 상수만 정의합니다. CRUD와 fetch는 직접 구현합니다.
 export const STORAGE_KEYS = Object.freeze({
-  users: "enjoytrip:v1:users",
+  users: "enjoytrip:v1:members",
   session: "enjoytrip:v1:session",
   plans: "enjoytrip:v1:plans",
   hotplaces: "enjoytrip:v1:hotplaces",

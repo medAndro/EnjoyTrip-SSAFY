@@ -7,6 +7,7 @@
       여행 계획 | EnjoyTrip
     </title>
     <link rel="icon" href="./assets/icons/pin.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/vendor/bootstrap.min.css">
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/plans.css">
     <link rel="stylesheet" href="./css/attractions.css">
@@ -58,12 +59,7 @@
         </div>
       </div>
     </header>
-    <div class="preview-notice">
-      <div class="container">
-        화면 레퍼런스 · 검색, 저장, 로그인, 지도 기능 연결 전
-      </div>
-    </div>
-    <main id="main" class="container">
+<main id="main" class="container">
       <div class="page-heading">
         <span class="eyebrow">
           PLAN YOUR TRIP
@@ -77,7 +73,7 @@
       </div>
       <div class="planner-layout">
         <aside class="stack">
-          <section class="panel" aria-labelledby="saved-title">
+          <section class="panel shadow-sm" aria-labelledby="saved-title">
             <h2 id="saved-title">
               나의 여행 계획
             </h2>
@@ -87,7 +83,7 @@
               회원당 한 개의 계획을 저장하고 다시 불러옵니다.
             </p>
           </section>
-          <section class="panel">
+          <section class="panel shadow-sm">
             <h2>
               여행지 더하기
             </h2>
@@ -100,28 +96,28 @@
           </section>
         </aside>
         <div class="stack">
-          <section class="panel" aria-labelledby="plan-title-heading">
+          <section class="panel shadow-sm" aria-labelledby="plan-title-heading">
             <h2 id="plan-title-heading">
               여행 기본 정보
             </h2>
-            <form id="plan-form" class="member-form" data-preview-form>
+            <form id="plan-form" class="member-form">
               <div class="field">
                 <label for="plan-title">
                   여행 제목
                 </label>
-                <input id="plan-title" name="plan-title" type="text" required maxlength="60" placeholder="예: 주말 서울 여행">
+                <input class="form-control" id="plan-title" name="plan-title" type="text" required maxlength="60" placeholder="예: 주말 서울 여행">
               </div>
               <div class="field">
                 <label for="start-date">
                   여행 시작일
                 </label>
-                <input id="start-date" name="start-date" type="date" required>
+                <input class="form-control" id="start-date" name="start-date" type="date" required>
               </div>
               <div class="field">
                 <label for="end-date">
                   여행 종료일
                 </label>
-                <input id="end-date" name="end-date" type="date" required>
+                <input class="form-control" id="end-date" name="end-date" type="date" required>
               </div>
               <div class="field">
                 <label for="plan-memo">
@@ -141,72 +137,26 @@
               </div>
             </form>
           </section>
-          <section class="panel" aria-labelledby="schedule-title">
+          <section class="panel shadow-sm" aria-labelledby="schedule-title">
             <div class="section-heading">
               <h2 id="schedule-title">
                 방문 일정
               </h2>
               <span class="badge">
-                순서 배치 예시
+                최대 5개 · 드래그 또는 버튼으로 순서 변경
               </span>
             </div>
-            <ol id="schedule-list" class="schedule-list">
-              <li class="schedule-item" data-sample>
-                <span class="badge">
-                  첫 번째 방문
-                </span>
-                <h3>
-                  서울 관광지 샘플
-                </h3>
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="visit-date">
-                      방문일
-                    </label>
-                    <input id="visit-date" name="visit-date" type="date" >
-                  </div>
-                  <div class="field">
-                    <label for="visit-time">
-                      방문 시간
-                    </label>
-                    <input id="visit-time" name="visit-time" type="time" >
-                  </div>
-                  <div class="field">
-                    <label for="cost">
-                      예상 경비 (원)
-                    </label>
-                    <input id="cost" name="cost" type="number" min="0" step="1000" value="10000">
-                  </div>
-                  <div class="field">
-                    <label for="item-memo">
-                      방문 메모
-                    </label>
-                    <input id="item-memo" name="item-memo" type="text" maxlength="200">
-                  </div>
-                </div>
-                <div class="actions section">
-                  <button type="button" class="secondary" disabled>
-                    위로
-                  </button>
-                  <button type="button" class="secondary" disabled>
-                    아래로
-                  </button>
-                  <button type="button" class="secondary" disabled>
-                    제외
-                  </button>
-                </div>
-              </li>
-            </ol>
+            <ol id="schedule-list" class="schedule-list"></ol>
             <div class="row plan-total">
               <strong>
                 총 예상 경비
               </strong>
               <span id="total-cost">
-                샘플 10,000원
+                0원
               </span>
             </div>
           </section>
-          <section class="panel">
+          <section class="panel shadow-sm">
             <h2>
               방문 위치
             </h2>
@@ -232,13 +182,11 @@
           EnjoyTrip · 우리 손으로 만드는 여행
         </p>
         <p>
-          일러스트와 데이터는 학습용 샘플입니다.
+          관광 정보: 한국관광공사 · 회원·일정: 브라우저 Storage
         </p>
       </div>
     </footer>
-    <script type="module" src="./js/preview.js">
-    </script>
-    <script type="module" src="./js/common.js">
+<script type="module" src="./js/common.js">
     </script>
     <script type="module" src="./js/plans.js">
     </script>

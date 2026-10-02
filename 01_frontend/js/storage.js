@@ -1,32 +1,18 @@
-// 담당 B — 공통 JSON 저장/복원, A도 같은 함수를 사용합니다.
-// readJSON(storage, key, fallback) → getItem → 없으면 fallback → JSON.parse.
-// writeJSON(storage, key, value) → JSON.stringify → setItem.
-// 잘못된 JSON/용량 초과를 조용히 덮지 말고 명확한 오류로 전달합니다.
-// 회원/일정/Hotplace의 필터·CRUD 규칙은 각 담당 기능 파일에 둡니다.
-// localStorage.clear()로 다른 기능/프로젝트의 데이터까지 지우지 않습니다.
-//-> 삭제가 필요하면 localStorage.removeItem("키"); 로 지우기. 
-
-// JSON 데이터를 localStorage에 저장하는 함수
-export function writeJSON(key, value) {
-  try{
-  const json = JSON.stringify(value);
-  localStorage.setItem(key, json);
-  }catch(error){
-    throw new Error(`JSON 저장 실패: ${key}`, {cause: error});
-  }
-}
-
-// localStorage에서 JSON 데이터를 읽는 함수
-export function readJSON(key, defaultValue) {
-  const json = localStorage.getItem(key);
-
-  if (json === null) {
-    return defaultValue;
-  }
-
+// wonandonly의 JSON 함수에 저장소 인자를 추가. 기존 두 인자 호출도 지원합니다.
+export function readJSON(storage, key, fallback) {
+  if (typeof storage === "string") [storage, key, fallback] = [localStorage, storage, key];
   try {
-    return JSON.parse(json);
-  } catch (error) {
-    throw new Error(`JSON 파싱 실패: ${key}`, { cause: error });
-  }
+    const json = storage.getItem(key);
+    return json === null ? fallback : JSON.parse(json);
+  } catch (cause) { throw new Error("저장된 데이터를 읽지 못했습니다. 브라우저 저장소를 확인해주세요.", { cause }); }
+}
+export function writeJSON(storage, key, value) {
+  if (typeof storage === "string") [storage, key, value] = [localStorage, storage, key];
+  try { storage.setItem(key, JSON.stringify(value)); }
+  catch (cause) { throw new Error("저장에 실패했습니다. 저장 공간 또는 브라우저 설정을 확인해주세요.", { cause }); }
+}
+export function readArray(storage, key) {
+  const value = readJSON(storage, key, []);
+  if (!Array.isArray(value)) throw new Error("저장된 목록 형식이 올바르지 않습니다.");
+  return value;
 }

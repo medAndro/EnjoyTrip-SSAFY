@@ -1,209 +1,83 @@
-// 담당 B — F107/F108. 페이지별 body.dataset.page 값으로 초기화를 구분합니다.
-// signup: 폼 검증 → ID 중복 확인 → 샘플 회원 저장.
-// login: 샘플 회원 대조 → sessionStorage에 userId 저장 → 화면 이동.
-// recover: ID+샘플 이메일 확인 → 새 데모 비밀번호 설정(실제 메일 발송 없음).
-// mypage: 로그인 확인 → 내 정보 표시 → 수정/탈퇴.
-// 탈퇴: 현재 회원을 지우고 계획/Hotplace 배열에서 ownerId가 같은 항목을 제거합니다.
-// 사용자 입력은 innerHTML 대신 textContent/value로 반영합니다.
-// 실제 submit 리스너 연결 시 data-preview-form 속성과 해당 disabled를 제거합니다.
-
-import { readJSON, writeJSON } from "./storage.js";
-import { getCurrentUser, setSession, clearSession } from "./session.js";
-
-const MEMBERS_KEY = "enjoytrip:v1:members";
-
-// 1. 회원가입
-export function signup(){
-  console.log("signup 실행됨");
-  const inputId=document.querySelector("#user-id");
-  const inputNickname=document.querySelector("#nickname");
-  const inputEmail=document.querySelector("#email");
-  const inputPw=document.querySelector("#password");
-  const inputPw2=document.querySelector("#password-confirm");
-  const message = document.querySelector(".hint");
-
-  //빠진 값 있는지 확인
-  if (
-    !inputId.value ||
-    !inputNickname.value ||
-    !inputEmail.value ||
-    !inputPw.value ||
-    !inputPw2.value
-  ) {
-    alert("모든 값을 입력해주세요.");
-    return null;
-  }
-
-  //id 중복 확인
-  const members = readJSON(MEMBERS_KEY, []);
-  const member=members.find(
-    member=>member.id===inputId.value
-  );
-
-  if(member){
-    alert("이미 사용 중인 아이디입니다.");
-    return null;
-  }
-  //아니면 다음 검증으로 넘어감 
-
-  //비밀번호 일치 확인
-  if(inputPw.value !== inputPw2.value){
-    alert("비밀번호가 일치하지 않습니다.");
-    return null;
-  } 
-
-  //멤버 저장: const members = readJSON(MEMBERS_KEY, []); 니까 배열로 저장해줌 
-  members.push({
-    id: inputId.value,
-    nickname: inputNickname.value,
-    email: inputEmail.value,
-    password: inputPw.value
-  });
-
-  writeJSON(MEMBERS_KEY, members);
-  alert("회원가입이 완료되었습니다.");
-  location.href = "index.html";
-}
-
-const form = document.querySelector("#signup-form");
-if(form){
-  form.addEventListener("submit", (event) => {
+// wonandonly의 가입·로그인·정보 수정·탈퇴 흐름을 유지하고 통합 오류 및 재설정을 보완했습니다.
+import { readArray, writeJSON } from "./storage.js";
+import { getCurrentUser, setSession, clearSession, MEMBERS_KEY } from "./session.js";
+import { STORAGE_KEYS } from "./config.js";
+import { status } from "./ui.js";
+const value = id => document.querySelector(`#${id}`).value.trim();
+const password = id => document.querySelector(`#${id}`).value;
+function bind(id, action) {
+  const form = document.querySelector(`#${id}`); if (!form) return;
+  form.addEventListener("submit", event => {
     event.preventDefault();
-    signup();
+    try { action(form); } catch (error) { status(form.querySelector('[role="status"]'), error.message, true); }
   });
 }
-
-
-// 2. 로그인
-//샘플 회원 대조 → sessionStorage에 userId 저장 → 화면 이동.
-export function login(){
-  console.log("로그인 함수 실행");
-  const inputId=document.querySelector("#user-id");
-  const inputPw=document.querySelector("#password");
-
-  const members=readJSON(MEMBERS_KEY,[]);
-  const member=members.find(
-    member=>member.id===inputId.value
-  );
-  
-  //계정 존재 시 비밀번호 일치 여부 판별
-  if(member){
-    if(member.password!==inputPw.value){
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-    setSession(inputId.value)
-    alert("로그인 완료!");
-    location.href = "index.html";
-  }
-
-  else{
-    //계정 존재 x
-    alert("회원 정보가 존재하지 않습니다.");
-    return;
-  }
+function validateProfile(id, nickname, email) {
+  if (!id || !nickname || !email) throw new Error("필수 항목을 입력해주세요.");
+  if (!/^[A-Za-z0-9_-]{4,20}$/.test(id)) throw new Error("아이디는 영문·숫자·밑줄·하이픈 4~20자로 입력해주세요.");
+  if (nickname.length > 20 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("닉네임 길이 또는 이메일 형식을 확인해주세요.");
 }
-
-const loginform = document.querySelector("#login-form");
-if(loginform){
-  loginform.addEventListener("submit", (event) => {
-    event.preventDefault();
-    login();
-  });
+function validatePassword(first, second) {
+  if (first.length < 8) throw new Error("비밀번호는 8자 이상 입력해주세요.");
+  if (first !== second) throw new Error("비밀번호 확인이 일치하지 않습니다.");
 }
-
-const profileForm=document.querySelector("#profile-form");
-if(profileForm){
-  const currentUser=getCurrentUser();
-
-  if(!currentUser){
-    alert ("로그인이 필요한 서비스입니다.");
-    location.href="login.html";
-  }else{
-    const inputId = document.querySelector("#user-id");
-    const inputNickname = document.querySelector("#nickname");
-    const inputEmail = document.querySelector("#email");
-
-    const profileNickname = document.querySelector("#profile-nickname");
-    const profileId = document.querySelector("#profile-id");
-
-    const inputPassword = document.querySelector("#password");
-    const inputPassword2 = document.querySelector("#password2");
-
-    //현재 회원 정보 가져와서 뿌리기
-    inputId.value=currentUser.id;
-    inputNickname.value=currentUser.nickname;
-    inputEmail.value=currentUser.email;
-
-    profileNickname.textContent = currentUser.nickname;
-    profileId.textContent = currentUser.id;
-
-    profileForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-
-      const members = readJSON(MEMBERS_KEY, []);
-
-      const member = members.find(
-        member => member.id === currentUser.id
-      );
-
-      if (!member) {
-        alert("회원 정보를 찾을 수 없습니다.");
-        return;
-      }
-
-    if (inputPassword.value !== inputPassword2.value) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
+bind("signup-form", () => {
+  const id = value("user-id"), nickname = value("nickname"), email = value("email");
+  validateProfile(id, nickname, email); validatePassword(password("password"), password("password-confirm"));
+  const members = readArray(localStorage, MEMBERS_KEY);
+  if (members.some(member => member.id === id)) throw new Error("이미 사용 중인 아이디입니다.");
+  members.push({ id, nickname, email, password: password("password") });
+  writeJSON(localStorage, MEMBERS_KEY, members); location.href = "./login.html?signup=done";
+});
+bind("login-form", () => {
+  const member = readArray(localStorage, MEMBERS_KEY).find(member => member.id === value("user-id") && member.password === password("password"));
+  if (!member) throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
+  setSession(member.id); location.href = "./index.html";
+});
+bind("recover-form", form => {
+  const members = readArray(localStorage, MEMBERS_KEY);
+  const member = members.find(member => member.id === value("recover-id") && member.email === value("recover-email"));
+  if (!member) throw new Error("아이디와 이메일이 일치하는 회원이 없습니다.");
+  validatePassword(password("new-password"), password("new-password-confirm"));
+  member.password = password("new-password"); writeJSON(localStorage, MEMBERS_KEY, members);
+  form.reset(); status(form.querySelector('[role="status"]'), "데모 비밀번호가 변경되었습니다. 새 비밀번호로 로그인하세요.");
+});
+const profile = document.querySelector("#profile-form");
+if (profile) {
+  try {
+    const user = getCurrentUser();
+    if (!user) { location.replace("./login.html"); }
+    else {
+      for (const [id, text] of [["user-id", user.id], ["nickname", user.nickname], ["email", user.email]]) document.querySelector(`#${id}`).value = text;
+      document.querySelector("#profile-nickname").textContent = user.nickname;
+      document.querySelector("#profile-id").textContent = user.id;
+      bind("profile-form", form => {
+        const members = readArray(localStorage, MEMBERS_KEY), member = members.find(item => item.id === user.id);
+        if (!member) throw new Error("회원 정보를 찾을 수 없습니다.");
+        validateProfile(user.id, value("nickname"), value("email"));
+        if (password("password") || password("password2")) {
+          validatePassword(password("password"), password("password2")); member.password = password("password");
+        }
+        member.nickname = value("nickname"); member.email = value("email"); writeJSON(localStorage, MEMBERS_KEY, members);
+        document.querySelector("#profile-nickname").textContent = member.nickname;
+        const menuUser = document.querySelector('[data-session-user]'); if (menuUser) menuUser.textContent = `${member.nickname}님`;
+        document.querySelector("#password").value = ""; document.querySelector("#password2").value = "";
+        status(form.querySelector('[role="status"]'), "회원 정보를 저장했습니다.");
+      });
+      document.querySelector("#withdraw").addEventListener("click", () => {
+        if (!confirm("회원과 본인의 여행 계획·Hotplace를 삭제할까요?")) return;
+        const keys = [MEMBERS_KEY, STORAGE_KEYS.plans, STORAGE_KEYS.hotplaces];
+        const before = keys.map(key => localStorage.getItem(key));
+        try {
+          // 먼저 모든 목록을 검증하고, 저장 실패 시 이전 상태로 복구합니다.
+          const records = keys.map(key => readArray(localStorage, key));
+          records.forEach((items, index) => writeJSON(localStorage, keys[index], items.filter(item => index === 0 ? item.id !== user.id : item.ownerId !== user.id)));
+          clearSession(); location.href = "./index.html";
+        } catch (error) {
+          keys.forEach((key, index) => { try { if (before[index] === null) localStorage.removeItem(key); else localStorage.setItem(key, before[index]); } catch { /* 저장소 오류는 아래 안내 */ } });
+          status(profile.querySelector('[role="status"]'), error.message, true);
+        }
+      });
     }
-
-      member.password = inputPassword.value;
-      member.nickname = inputNickname.value;
-      member.email = inputEmail.value;
-
-      writeJSON(MEMBERS_KEY, members);
-
-      alert("회원 정보가 수정되었습니다.");
-      location.reload();
-    });
-  }
-
-
-  
-  const withdrawButton = document.querySelector("#withdraw");
-  withdrawButton.addEventListener("click", () => {
-    const confirmed = confirm("정말 탈퇴하시겠습니까?");
-
-    if (!confirmed) {
-      return;
-    }
-
-    const members = readJSON(MEMBERS_KEY, []);
-
-    const newMembers = members.filter(
-      member => member.id !== currentUser.id
-    );
-
-    writeJSON(MEMBERS_KEY, newMembers);
-
-    const plans = readJSON(PLANS_KEY, []);
-
-    const newPlans = plans.filter(
-      plan => plan.ownerId !== currentUser.id
-    );
-
-    writeJSON(PLANS_KEY, newPlans);
-
-    const hotplaces = readJSON(HOTPLACES_KEY, []);
-
-    const newHotplaces = hotplaces.filter(
-      hotplace => hotplace.ownerId !== currentUser.id
-    );
-
-    writeJSON(HOTPLACES_KEY, newHotplaces);
-    
-    clearSession();
-    alert("회원 탈퇴가 완료되었습니다.");
-    location.href = "index.html";
-  });
+  } catch (error) { status(profile.querySelector('[role="status"]'), error.message, true); }
 }
