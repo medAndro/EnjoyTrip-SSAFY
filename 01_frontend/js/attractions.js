@@ -19,6 +19,7 @@ async function init() {
         const attractions = await loadAttractions();
         // console.log(attractions, attractions.length);
         renderAttractions(attractions);
+        bindSearchEvents(attractions);
     } catch (e) {
         console.log(e);
     }
@@ -29,15 +30,16 @@ function renderAttractions(attractions) {
     const placeList = document.querySelector("#place-list")
     placeList.replaceChildren()
 
-    attractions.forEach(place => {
-        // console.log(place)
-        const card = document.createElement("li");
-        card.classList.add("place-card");
-        card.dataset.placeId = place.id;
+    if (attractions.length > 0) {
+        attractions.forEach(place => {
+            // console.log(place)
+            const card = document.createElement("li");
+            card.classList.add("place-card");
+            card.dataset.placeId = place.id;
 
-        const attrType = CONTENT_TYPES.find(item => item.code === place.contentTypeId);
-        card.innerHTML =
-            `
+            const attrType = CONTENT_TYPES.find(item => item.code === place.contentTypeId);
+            card.innerHTML =
+                `
         <span class="badge">
             ${attrType.label}
         </span>
@@ -51,10 +53,35 @@ function renderAttractions(attractions) {
             상세 보기
         </button>
         `
+            placeList.append(card);
+        });
+    }else{
+        const card = document.createElement("li");
+        card.classList.add("place-card");
+        card.innerHTML = "<h3>검색 결과가 없습니다</h3>"
         placeList.append(card);
-    });
+    }
+
 
     document.querySelector("#result-count").textContent = attractions.length + "개";
+}
 
 
+function bindSearchEvents(attractions) {
+    const searchForm = document.querySelector("#search-form");
+
+    searchForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const region = searchForm.querySelector("#region").value;
+        const contentType = searchForm.querySelector("#content-type").value;
+        const keyword = searchForm.querySelector("#keyword").value.trim();
+
+        console.log(region, contentType, keyword)
+
+        let filtered = attractions.filter(item => region === "" || item.region === region);
+        filtered = filtered.filter(item => contentType === "" || item.contentTypeId === contentType);
+        filtered = filtered.filter(item => keyword === "" || item.name.includes(keyword));
+        console.log(filtered.length);
+        renderAttractions(filtered);
+    });
 }
