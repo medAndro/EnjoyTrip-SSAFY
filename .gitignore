@@ -1,0 +1,33 @@
+# 운영체제 파일
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 프로젝트에서 공유하지 않는 로컬 파일
+AGENTS.md
+자바전공_enjoytrip_16_03_프론트.pdf
+
+# 개인 에디터 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 로컬 환경 설정 및 비밀 값
+.env
+.env.*
+!.env.example
+!.env.*.example
+key.js
+
+# 로그 및 임시 파일
+*.log
+*.tmp
+*.temp
+
+# 도구 사용 시 생성되는 의존성 및 빌드 결과
+node_modules/
+dist/
+build/
+coverage/
