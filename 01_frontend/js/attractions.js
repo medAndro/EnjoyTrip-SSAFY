@@ -10,24 +10,40 @@
 
 import { loadAttractions } from "./data.js";
 import { CONTENT_TYPES } from "./config.js";
+import { createMap } from "./map.js"
+import { KAKAO_MAP_KEY } from "./keys.js"
 
 
+let mapController;
+let currentDisplayedAttr = [];
 init();
 
 async function init() {
     try {
         const attractions = await loadAttractions();
+        const mapElement = document.querySelector("#map");
         // console.log(attractions, attractions.length);
         renderAttractions(attractions);
         bindSearchEvents(attractions);
         bindDetailEvents(attractions);
+        mapController = await createMap(mapElement, {key: KAKAO_MAP_KEY});
+        updatePlaces(currentDisplayedAttr);
+        console.log(mapController)
     } catch (e) {
         console.log(e);
     }
 
 }
 
+function updatePlaces(attractions){
+            if(mapController){
+            mapController.updatePlaces(attractions);
+        }
+
+}
+
 function renderAttractions(attractions) {
+    currentDisplayedAttr = attractions;
     const placeList = document.querySelector("#place-list")
     placeList.replaceChildren()
 
@@ -63,8 +79,8 @@ function renderAttractions(attractions) {
         placeList.append(card);
     }
 
-
     document.querySelector("#result-count").textContent = attractions.length + "개";
+    updatePlaces(attractions);
 }
 
 
