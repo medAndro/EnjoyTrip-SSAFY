@@ -7,3 +7,18 @@
 // 6. 로딩/빈 결과/오류를 각각 표시한다. 공공 API 연동은 별도 단계로 진행한다.
 // 7. 상세의 일정 추가는 plans.js와 합의한 draft 규칙에 따라 연결한다.
 // 시작 전: 해당 폼의 data-preview-form 속성/버튼 disabled를 제거합니다.
+
+import { loadAttractions } from "./data.js";
+
+init();
+
+async function init() {
+    try {
+        const attractions = await loadAttractions();
+        console.log(attractions, attractions.length);
+    } catch (e) {
+        console.log(e);
+    }
+
+}
+
