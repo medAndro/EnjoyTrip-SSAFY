@@ -9,13 +9,17 @@
 // 시작 전: 해당 폼의 data-preview-form 속성/버튼 disabled를 제거합니다.
 
 import { loadAttractions } from "./data.js";
-import { CONTENT_TYPES } from "./config.js";
-import { createMap } from "./map.js"
-import { KAKAO_MAP_KEY } from "./keys.js"
+import { CONTENT_TYPES, STORAGE_KEYS } from "./config.js";
+import { createMap } from "./map.js";
+import { KAKAO_MAP_KEY } from "./keys.js";
+// TODO(B 연동): session.js와 storage.js에 아래 함수가 export되면 주석을 해제합니다.
+// import { getCurrentUser } from "./session.js";
+// import { readJSON, writeJSON } from "./storage.js";
 
 
 let mapController;
 let currentDisplayedAttr = [];
+let selectedAttr;
 init();
 
 async function init() {
@@ -26,7 +30,7 @@ async function init() {
         renderAttractions(attractions);
         bindSearchEvents(attractions);
         bindDetailEvents(attractions);
-        mapController = await createMap(mapElement, {key: KAKAO_MAP_KEY});
+        mapController = await createMap(mapElement, { key: KAKAO_MAP_KEY });
         updatePlaces(currentDisplayedAttr);
         console.log(mapController)
     } catch (e) {
@@ -35,10 +39,10 @@ async function init() {
 
 }
 
-function updatePlaces(attractions){
-            if(mapController){
-            mapController.updatePlaces(attractions);
-        }
+function updatePlaces(attractions) {
+    if (mapController) {
+        mapController.updatePlaces(attractions);
+    }
 
 }
 
@@ -114,6 +118,7 @@ function bindDetailEvents(attractions) {
             const attr = attractions.find(item => item.id === card.dataset.placeId);
             console.log(attr)
             if (attr) {
+                selectedAttr = attr;
                 dialog.querySelector("#detail-title").textContent = attr.name;
                 dialog.querySelector("#detail-description").textContent = attr.description;
                 dialog.querySelector("#detail-address").textContent = attr.address;
@@ -126,9 +131,48 @@ function bindDetailEvents(attractions) {
     });
 
     const dialogCloseBtn = document.querySelector("#close-detail");
+    const addPlanBtn = document.querySelector("#add-to-plan");
 
     dialogCloseBtn.addEventListener("click", (e) => {
         dialog.close();
     })
+
+    // TODO(B 연동): 위 import와 아래 이벤트의 주석을 해제하고 버튼 비활성화 코드를 제거합니다.
+    // 연결 후 비로그인 차단, 새로고침 후 중복 검사, 최대 5개 제한을 확인합니다.
+    addPlanBtn.disabled = true;
+    /*
+    addPlanBtn.addEventListener("click", (e) => {
+        if (selectedAttr) {
+            try {
+                const currentUser = getCurrentUser();
+                if (!currentUser) {
+                    alert("로그인 후 이용해주세요");
+                    return;
+                }
+                const ids = readJSON(sessionStorage, STORAGE_KEYS.planDraft, []);
+                if (ids.includes(selectedAttr.id)) {
+                    alert("이미 추가한 관광지입니다!");
+                    return;
+                }
+
+                if (ids.length >= 5) {
+                    alert("최대 5개까지만 추가할 수 있습니다!");
+                } else {
+
+                    ids.push(selectedAttr.id);
+                    writeJSON(sessionStorage, STORAGE_KEYS.planDraft, ids);
+                    dialog.close();
+                    console.log(ids);
+                    alert("추가 되었습니다!");
+                }
+            } catch (e) {
+                console.log(e);
+                alert("일정 추가에 실패했습니다!");
+            }
+        } else {
+            alert("선택한 관광지가 없습니다");
+        }
+    })
+    */
 
 }
