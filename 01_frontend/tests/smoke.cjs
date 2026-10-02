@@ -1,0 +1,85 @@
+// 실행: PLAYWRIGHT_PATH, CHROME_PATH를 지정하거나 README의 검증 명령 사용.
+const fs = require('fs');
+const path = require('path');
+const assert = require('node:assert/strict');
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
+const base = process.env.TEST_URL || 'http://127.0.0.1:8765';
+const shots = path.resolve(__dirname, '../screenshots');
+fs.mkdirSync(shots, { recursive: true });
+(async () => {
+  const browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  const page = await context.newPage();
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  page.on('dialog', dialog => dialog.accept());
+  const goto = name => page.goto(`${base}/${name}.html`);
+  const shot = name => page.screenshot({ path: path.join(shots, name + '.png'), fullPage: true });
+  const fill = (id, text) => page.locator('#' + id).fill(text);
+  const userId = 'qa' + Date.now();
+  async function signup(id) {
+    await goto('signup'); await fill('user-id', id); await fill('nickname', '통합테스트 여행자'); await fill('email', id + '@example.com'); await fill('password', 'demo-pass123'); await fill('password-confirm', 'demo-pass123'); await shot('02-signup');
+    await page.locator('#demo-consent').check(); await page.locator('#signup-form button[type=submit]').click(); await page.waitForURL('**/login.html?signup=done');
+  }
+  async function login(id, pw = 'demo-pass123') {
+    await goto('login'); await fill('user-id', id); await fill('password', pw); await page.locator('#login-form button[type=submit]').click(); await page.waitForURL('**/index.html');
+  }
+  await goto('index'); await shot('01-home');
+  const photo = await page.locator('.hero-art').screenshot();
+  await goto('plans'); await page.locator('#plan-form [role=status]').filter({ hasText: '로그인' }).waitFor();
+  await signup(userId); await login(userId);
+  await goto('attractions');
+  await page.waitForFunction(() => document.querySelector('#search-status').textContent.includes('실시간') || document.querySelector('#search-status').classList.contains('danger'), { timeout: 45000 });
+  assert.match(await page.locator('#search-status').innerText(), /실시간/);
+  assert.equal(await page.locator('#region option').count(), 18);
+  await page.locator('#region').selectOption('1'); await page.locator('#content-type').selectOption('12'); await page.locator('#keyword').fill('경복궁'); await page.locator('#search-form button').click();
+  await page.waitForFunction(() => !document.querySelector('#search-form').hasAttribute('aria-busy'));
+  assert.ok(await page.locator('#place-list .place-card').count());
+  await page.waitForFunction(() => !document.querySelector('#map').classList.contains('map-placeholder'), null, { timeout: 20000 });
+  await shot('03-attractions-api');
+  await page.locator('#place-list [data-action=detail]').first().click();
+  await page.waitForFunction(() => !document.querySelector('#detail-status').textContent.includes('불러오는'));
+  await page.locator('#add-to-plan').click(); await page.locator('#detail-status').filter({ hasText: '초안에 추가' }).waitFor();
+  await shot('04-attraction-detail'); await page.locator('#close-detail').click();
+  // 실제 API에서 다른 관광지를 추가합니다.
+  await page.locator('#keyword').fill(''); await page.locator('#search-form button').click(); await page.waitForFunction(() => !document.querySelector('#search-form').hasAttribute('aria-busy'));
+  await page.locator('#place-list [data-action=detail]').first().click(); await page.locator('#add-to-plan').click(); await page.locator('#close-detail').click();
+  await goto('plans'); await page.locator('#schedule-list .schedule-item').nth(1).waitFor();
+  await fill('plan-title', '서울 주말 여행'); await fill('start-date', '2026-10-03'); await fill('end-date', '2026-10-04'); await fill('plan-memo', '궁궐과 도심을 함께 둘러보기');
+  await fill('visitDate-0', '2026-10-03'); await fill('visitDate-1', '2026-10-04'); await fill('visitTime-0', '10:00'); await fill('cost-0', '12000'); await fill('cost-1', '8000'); await fill('memo-0', '기존 메모 유지');
+  await page.locator('#schedule-list [data-action=down]').first().click();
+  assert.equal(await page.locator('#memo-1').inputValue(), '기존 메모 유지');
+  await page.setViewportSize({ width: 1440, height: 1800 });
+  await page.locator('#schedule-list .schedule-item .badge').first().dragTo(page.locator('#schedule-list .schedule-item .badge').nth(1));
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  assert.equal(await page.locator('#memo-0').inputValue(), '기존 메모 유지');
+  await page.locator('#schedule-list [data-action=down]').first().click();
+  await fill('start-date', '2026-10-05'); await page.locator('#plan-form button[type=submit]').click();
+  await page.locator('#plan-form [role=status]').filter({ hasText: '시작일' }).waitFor(); await fill('start-date', '2026-10-03');
+  await page.locator('#plan-form button[type=submit]').click(); await page.locator('#plan-form [role=status]').filter({ hasText: '저장했습니다' }).waitFor();
+  await page.reload(); await page.locator('#schedule-list .schedule-item').nth(1).waitFor();
+  assert.equal(await page.locator('#total-cost').innerText(), '20,000원'); assert.equal(await page.locator('#memo-1').inputValue(), '기존 메모 유지');
+  assert.equal(await page.evaluate(() => sessionStorage.getItem('enjoytrip:v1:plan-draft')), null);
+  await page.waitForFunction(() => !document.querySelector('#plan-map').classList.contains('map-placeholder'), null, { timeout: 20000 });
+  await shot('05-plans');
+  await goto('hotplaces'); await fill('place-name', '내가 발견한 서울 산책길'); await fill('address', '서울 종로구 사직로 161'); await fill('visited-date', '2026-10-02'); await fill('description', '여행 중 기억에 남은 풍경을 기록했습니다.'); await fill('latitude', '37.5796'); await fill('longitude', '126.977');
+  await page.waitForFunction(() => !document.querySelector('#hotplace-map').classList.contains('map-placeholder'), null, { timeout: 20000 });
+  await page.locator('#find-address').click(); await page.locator('#hotplace-form [role=status]').filter({ hasText: '좌표를 찾았습니다' }).waitFor();
+  await page.locator('#photo').setInputFiles({ name: 'test.png', mimeType: 'image/png', buffer: photo });
+  await page.locator('#hotplace-form [role=status]').filter({ hasText: '준비되었습니다' }).waitFor(); await page.locator('#hotplace-form button[type=submit]').click(); await page.locator('#hotplace-list article').waitFor();
+  await page.reload(); await page.locator('#hotplace-list article').waitFor(); assert.equal(await page.locator('#hotplace-list article').count(), 1);
+  await page.waitForFunction(() => !document.querySelector('#hotplace-map').classList.contains('map-placeholder'), null, { timeout: 20000 }); await shot('06-hotplaces');
+  await goto('mypage'); await fill('nickname', '서울 여행자'); await page.locator('#profile-form button[type=submit]').click(); await page.locator('#profile-form [role=status]').filter({ hasText: '저장했습니다' }).waitFor(); await shot('07-profile');
+  await page.locator('[data-logout]').click();
+  await signup(userId + 'b'); await login(userId + 'b'); await goto('plans'); await page.locator('#schedule-list .empty-state').waitFor();
+  await goto('hotplaces'); await page.locator('#hotplace-list .empty-state').waitFor();
+  await page.locator('[data-logout]').click(); await goto('login'); await fill('recover-id', userId); await fill('recover-email', userId + '@example.com'); await fill('new-password', 'changed123'); await fill('new-password-confirm', 'changed123'); await page.locator('#recover-form button').click(); await page.locator('#recover-form [role=status]').filter({ hasText: '변경되었습니다' }).waitFor(); await shot('08-recovery');
+  await login(userId, 'changed123');
+  await goto('mypage'); await page.locator('#withdraw').click(); await page.waitForURL('**/index.html');
+  const state = await page.evaluate(id => ({ members: JSON.parse(localStorage.getItem('enjoytrip:v1:members')).filter(x => x.id === id).length, plans: JSON.parse(localStorage.getItem('enjoytrip:v1:plans')).filter(x => x.ownerId === id).length, hotplaces: JSON.parse(localStorage.getItem('enjoytrip:v1:hotplaces')).filter(x => x.ownerId === id).length }), userId);
+  assert.deepEqual(state, { members: 0, plans: 0, hotplaces: 0 });
+  await page.setViewportSize({ width: 390, height: 844 }); await goto('index'); await shot('09-mobile-home');
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  assert.deepEqual(errors, []);
+  console.log(JSON.stringify({ result: 'PASS', checks: ['real TourAPI + Kakao maps + geocoding', 'signup/login', 'plan merge/reorder/drag/save/restore/date validation', 'photo registration/restore', 'two-account separation', 'profile/recovery', 'withdraw cleanup', 'mobile layout', 'no page errors'], screenshots: 9 }));
+  await browser.close();
+})().catch(error => { console.error(error.message); process.exit(1); });

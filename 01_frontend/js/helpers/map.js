@@ -52,6 +52,7 @@ export async function createPlaceMap(container, { key = "" } = {}) {
   container.style.height = "360px";
   const map = new maps.Map(container, { center: new maps.LatLng(37.5665, 126.978), level: 7 });
   let markers = [];
+  let route;
   return {
     updatePlaces(places) {
       this.clear();
@@ -69,7 +70,17 @@ export async function createPlaceMap(container, { key = "" } = {}) {
     focusPlace(place) {
       if (hasCoordinate(place)) map.panTo(new maps.LatLng(place.lat, place.lng));
     },
+    onClick(callback) {
+      maps.event.addListener(map, "click", event => callback(event.latLng.getLat(), event.latLng.getLng()));
+    },
+    drawRoute(places) {
+      route?.setMap(null);
+      const path = places.filter(hasCoordinate).map(place => new maps.LatLng(place.lat, place.lng));
+      if (path.length < 2) return;
+      route = new maps.Polyline({ map, path, strokeWeight: 4, strokeColor: "#24634e", strokeOpacity: .8, strokeStyle: "dash" });
+    },
     clear() {
+      route?.setMap(null);
       markers.forEach((marker) => marker.setMap(null));
       markers = [];
     },

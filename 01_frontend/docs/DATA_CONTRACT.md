@@ -1,12 +1,14 @@
+> 최종 통합: 회원 키는 wonandonly의 members를 유지합니다. 일정 항목에는 API 장애 시에도 복원할 수 있도록 관광지 정보 사본 place를 함께 저장합니다. 공통 JSON 함수는 저장소 지정과 기존 두 인자 호출을 모두 지원합니다. 관광지 기본 조회는 실제 TourAPI이며 자세한 실행 계약은 [README](../README.md)를 확인하세요.
+
 # 최소 데이터 계약
 
-구현을 쉽게 하기 위한 합의안이다. 아래 함수 이름은 TODO이며, 상수와 지도/사진 helper만 구현되어 있다. 일반 JS 객체/배열로 처리하고 클래스·서비스/DAO 계층을 만들지 않는다.
+구현을 쉽게 하기 위한 합의안이다. 아래 함수는 최종 통합에서 구현되었으며 상세 실행 구조는 README를 따른다. 일반 JS 객체/배열로 처리하고 클래스·서비스/DAO 계층을 만들지 않는다.
 
 ## 저장 키 (config.js)
 
 | 저장소 | 키 | 기본값 |
 | --- | --- | --- |
-| localStorage | enjoytrip:v1:users | [] |
+| localStorage | enjoytrip:v1:members | [] |
 | localStorage | enjoytrip:v1:plans | [] |
 | localStorage | enjoytrip:v1:hotplaces | [] |
 | sessionStorage | enjoytrip:v1:session | null |
@@ -51,11 +53,11 @@ clearSession()
 ## 회원
 
 ```js
-{ id: "demo-a", nickname: "여행자 A", email: "demo-a@example.com", demoPassword: "샘플 전용 값" }
+{ id: "demo-a", nickname: "여행자 A", email: "demo-a@example.com", password: "샘플 전용 값" }
 // sessionStorage: { userId: "demo-a" }
 ```
 
-가입 때 ID 중복과 비밀번호 확인을 검사한다. 수정은 닉네임/샘플 이메일만 한다. 데모 재설정은 ID+샘플 이메일 대조 후 새 값을 저장한다. 실제 비밀번호/민감 정보를 사용하지 않는 모의 인증이다. 메뉴나 세션에 demoPassword를 복사하지 않는다.
+가입 때 ID 중복과 비밀번호 확인을 검사한다. 수정은 닉네임/샘플 이메일만 한다. 데모 재설정은 ID+샘플 이메일 대조 후 새 값을 저장한다. 실제 비밀번호/민감 정보를 사용하지 않는 모의 인증이다. 메뉴나 세션에 password를 복사하지 않는다.
 
 ## 여행 계획 — 회원당 1개 / A
 

@@ -7,6 +7,7 @@
       Hotplace 기록 | EnjoyTrip
     </title>
     <link rel="icon" href="./assets/icons/pin.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/vendor/bootstrap.min.css">
     <link rel="stylesheet" href="./css/common.css">
     <link rel="stylesheet" href="./css/hotplaces.css">
     <link rel="stylesheet" href="./css/attractions.css">
@@ -58,12 +59,7 @@
         </div>
       </div>
     </header>
-    <div class="preview-notice">
-      <div class="container">
-        화면 레퍼런스 · 검색, 저장, 로그인, 지도 기능 연결 전
-      </div>
-    </div>
-    <main id="main" class="container">
+<main id="main" class="container">
       <div class="page-heading">
         <span class="eyebrow">
           SAVE YOUR MOMENTS
@@ -76,28 +72,29 @@
         </p>
       </div>
       <div class="hotplace-layout">
-        <section class="panel" aria-labelledby="hotplace-form-title">
+        <section class="panel shadow-sm" aria-labelledby="hotplace-form-title">
           <h2 id="hotplace-form-title">
             새 장소 등록
           </h2>
-          <form id="hotplace-form" class="member-form" data-preview-form>
+          <form id="hotplace-form" class="member-form">
             <div class="field">
               <label for="place-name">
                 장소 이름
               </label>
-              <input id="place-name" name="place-name" type="text" required maxlength="60">
+              <input class="form-control" id="place-name" name="place-name" type="text" required maxlength="60">
             </div>
             <div class="field">
               <label for="address">
                 주소
               </label>
-              <input id="address" name="address" type="text" required>
+              <input class="form-control" id="address" name="address" type="text" required>
             </div>
+            <button type="button" class="secondary" id="find-address">주소로 좌표 찾기</button>
             <div class="field">
               <label for="place-type">
                 장소 유형
               </label>
-              <select id="place-type" name="place-type">
+              <select class="form-select" id="place-type" name="place-type">
                 <option value="12">
                   관광지
                 </option>
@@ -125,13 +122,13 @@
               <label for="visited-date">
                 다녀온 날짜
               </label>
-              <input id="visited-date" name="visited-date" type="date" required>
+              <input class="form-control" id="visited-date" name="visited-date" type="date" required>
             </div>
             <div class="field">
               <label for="photo">
                 내가 찍은 사진
               </label>
-              <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
+              <input class="form-control" id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
             </div>
             <p class="hint">
               5MB 이하 JPG·PNG·WEBP 사진을 선택하세요.
@@ -150,17 +147,17 @@
                 <label for="latitude">
                   위도
                 </label>
-                <input id="latitude" name="latitude" type="number" required min="-90" max="90" step="any">
+                <input class="form-control" id="latitude" name="latitude" type="number" required min="-90" max="90" step="any">
               </div>
               <div class="field">
                 <label for="longitude">
                   경도
                 </label>
-                <input id="longitude" name="longitude" type="number" required min="-180" max="180" step="any">
+                <input class="form-control" id="longitude" name="longitude" type="number" required min="-180" max="180" step="any">
               </div>
             </div>
             <p class="hint">
-              3시간 기본안에서는 위도·경도를 직접 입력합니다. 회원당 최대 3개를 등록합니다.
+              주소 검색 또는 지도 클릭으로 좌표를 선택할 수 있습니다. 회원당 최대 3개를 등록합니다.
             </p>
             <p class="hint" role="status" aria-live="polite">
             </p>
@@ -170,7 +167,7 @@
           </form>
         </section>
         <div class="stack">
-          <section class="panel">
+          <section class="panel shadow-sm">
             <h2>
               장소 위치
             </h2>
@@ -184,7 +181,7 @@
               </span>
             </div>
           </section>
-          <section class="panel" aria-labelledby="my-hotplaces-title">
+          <section class="panel shadow-sm" aria-labelledby="my-hotplaces-title">
             <h2 id="my-hotplaces-title">
               나의 Hotplace
             </h2>
@@ -205,13 +202,11 @@
           EnjoyTrip · 우리 손으로 만드는 여행
         </p>
         <p>
-          일러스트와 데이터는 학습용 샘플입니다.
+          관광 정보: 한국관광공사 · 회원·일정: 브라우저 Storage
         </p>
       </div>
     </footer>
-    <script type="module" src="./js/preview.js">
-    </script>
-    <script type="module" src="./js/common.js">
+<script type="module" src="./js/common.js">
     </script>
     <script type="module" src="./js/hotplaces.js">
     </script>
