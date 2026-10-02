@@ -20,6 +20,7 @@ async function init() {
         // console.log(attractions, attractions.length);
         renderAttractions(attractions);
         bindSearchEvents(attractions);
+        bindDetailEvents(attractions);
     } catch (e) {
         console.log(e);
     }
@@ -49,13 +50,13 @@ function renderAttractions(attractions) {
         <p class="muted">
             ${place.address}
         </p>
-        <button type="button" class="secondary" data-action="detail" disabled="">
+        <button type="button" class="secondary" data-action="detail">
             상세 보기
         </button>
         `
             placeList.append(card);
         });
-    }else{
+    } else {
         const card = document.createElement("li");
         card.classList.add("place-card");
         card.innerHTML = "<h3>검색 결과가 없습니다</h3>"
@@ -84,4 +85,34 @@ function bindSearchEvents(attractions) {
         console.log(filtered.length);
         renderAttractions(filtered);
     });
+}
+
+function bindDetailEvents(attractions) {
+    const placeList = document.querySelector("#place-list");
+    const dialog = document.querySelector("#detail-dialog");
+    placeList.addEventListener("click", (e) => {
+        const detailButton = e.target.closest(`[data-action="detail"]`);
+
+        if (detailButton) {
+            const card = detailButton.closest(`.place-card`);
+            const attr = attractions.find(item => item.id === card.dataset.placeId);
+            console.log(attr)
+            if (attr) {
+                dialog.querySelector("#detail-title").textContent = attr.name;
+                dialog.querySelector("#detail-description").textContent = attr.description;
+                dialog.querySelector("#detail-address").textContent = attr.address;
+                dialog.querySelector("#detail-source").textContent = attr.source;
+                dialog.showModal();
+            }
+        }
+
+
+    });
+
+    const dialogCloseBtn = document.querySelector("#close-detail");
+
+    dialogCloseBtn.addEventListener("click", (e) => {
+        dialog.close();
+    })
+
 }
