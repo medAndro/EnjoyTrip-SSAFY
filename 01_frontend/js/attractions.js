@@ -9,16 +9,52 @@
 // 시작 전: 해당 폼의 data-preview-form 속성/버튼 disabled를 제거합니다.
 
 import { loadAttractions } from "./data.js";
+import { CONTENT_TYPES } from "./config.js";
+
 
 init();
 
 async function init() {
     try {
         const attractions = await loadAttractions();
-        console.log(attractions, attractions.length);
+        // console.log(attractions, attractions.length);
+        renderAttractions(attractions);
     } catch (e) {
         console.log(e);
     }
 
 }
 
+function renderAttractions(attractions) {
+    const placeList = document.querySelector("#place-list")
+    placeList.replaceChildren()
+
+    attractions.forEach(place => {
+        // console.log(place)
+        const card = document.createElement("li");
+        card.classList.add("place-card");
+        card.dataset.placeId = place.id;
+
+        const attrType = CONTENT_TYPES.find(item => item.code === place.contentTypeId);
+        card.innerHTML =
+            `
+        <span class="badge">
+            ${attrType.label}
+        </span>
+        <h3>
+            ${place.name}
+        </h3>
+        <p class="muted">
+            ${place.address}
+        </p>
+        <button type="button" class="secondary" data-action="detail" disabled="">
+            상세 보기
+        </button>
+        `
+        placeList.append(card);
+    });
+
+    document.querySelector("#result-count").textContent = attractions.length + "개";
+
+
+}
