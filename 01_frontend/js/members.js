@@ -6,3 +6,64 @@
 // 탈퇴: 현재 회원을 지우고 계획/Hotplace 배열에서 ownerId가 같은 항목을 제거합니다.
 // 사용자 입력은 innerHTML 대신 textContent/value로 반영합니다.
 // 실제 submit 리스너 연결 시 data-preview-form 속성과 해당 disabled를 제거합니다.
+
+import { readJSON, writeJSON } from "./storage.js";
+const MEMBERS_KEY = "enjoytrip:v1:members";
+
+export function signup(){
+  console.log("signup 실행됨");
+  const inputId=document.querySelector("#user-id");
+  const inputNickname=document.querySelector("#nickname");
+  const inputEmail=document.querySelector("#email");
+  const inputPw=document.querySelector("#password");
+  const inputPw2=document.querySelector("#password-confirm");
+  const message = document.querySelector(".hint");
+
+  //빠진 값 있는지 확인
+  if (
+    !inputId.value ||
+    !inputNickname.value ||
+    !inputEmail.value ||
+    !inputPw.value ||
+    !inputPw2.value
+  ) {
+    alert("모든 값을 입력해주세요.");
+    return null;
+  }
+
+  //id 중복 확인
+  const members = readJSON(MEMBERS_KEY, []);
+  const member=members.find(
+    member=>member.id===inputId.value
+  );
+
+  if(member){
+    alert("이미 사용 중인 아이디입니다.");
+    return null;
+  }
+  //아니면 다음 검증으로 넘어감 
+
+  //비밀번호 일치 확인
+  if(inputPw.value !== inputPw2.value){
+    alert("비밀번호가 일치하지 않습니다.");
+    return null;
+  } 
+
+  //멤버 저장: const members = readJSON(MEMBERS_KEY, []); 니까 배열로 저장해줌 
+  members.push({
+    id: inputId.value,
+    nickname: inputNickname.value,
+    email: inputEmail.value,
+    password: inputPw.value
+  });
+
+  writeJSON(MEMBERS_KEY, members);
+  alert("회원가입이 완료되었습니다.");
+  location.href = "index.html";
+}
+
+const form = document.querySelector("#signup-form");
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  signup();
+});
