@@ -45,6 +45,6 @@ export function getCurrentUser(){
 
 //로그아웃 -> enjoytrip:v1:session 및 enjoytrip:v1:plan-draft 키 삭제
 export function clearSession(){
-  sessionStorage.removeItem("SESSION_KEY");
+  sessionStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(PLAN_DRAFT_KEY);
 }
