@@ -1,0 +1,15 @@
+/* A 담당: 검색 결과 카드 / 지도 / 상세 모달의 상태별 CSS를 추가합니다. */
+.search-grid { display: grid; gap: 14px; align-items: end; }
+.explore-grid { display: grid; gap: 22px; margin-top: 24px; }
+.place-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.place-card { padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: white; }
+.place-card h3 { margin-block: 10px 4px; }
+.place-card p { font-size: 13px; margin-bottom: 14px; }
+.map-placeholder { min-height: 360px; display: grid; place-content: center; text-align: center; background-color: #edf1e8; background-image: linear-gradient(90deg, #ffffff88 1px, transparent 1px), linear-gradient(#ffffff88 1px, transparent 1px); background-size: 38px 38px; border: 1px solid var(--line); border-radius: 14px; }
+.map-placeholder img { width: 50px; margin: 0 auto 16px; }
+.detail-dialog { width: min(560px, calc(100% - 28px)); border: 1px solid var(--line); border-radius: 18px; padding: 26px; }
+.detail-dialog::backdrop { background: #193c3570; }
+@media (min-width: 800px) {
+  .search-grid { grid-template-columns: 1fr 1fr 1.5fr auto; }
+  .explore-grid { grid-template-columns: 360px minmax(0, 1fr); }
+}

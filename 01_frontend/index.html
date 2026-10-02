@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      여행의 시작 | EnjoyTrip
+    </title>
+    <link rel="icon" href="./assets/icons/pin.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/home.css">
+  </head>
+  <body data-page="index">
+    <a class="skip-link" href="#main">
+      본문으로 이동
+    </a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html">
+          <img src="./assets/icons/pin.svg" alt="">
+          EnjoyTrip
+        </a>
+        <nav class="site-nav" aria-label="주 메뉴">
+          <ul>
+            <li>
+              <a href="./attractions.html">
+                여행지 탐색
+              </a>
+            </li>
+            <li>
+              <a href="./plans.html">
+                여행 계획
+              </a>
+            </li>
+            <li>
+              <a href="./hotplaces.html">
+                Hotplace
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="account-links">
+          <a data-auth-link href="./login.html">
+            로그인
+          </a>
+          <a data-auth-link href="./signup.html">
+            회원가입
+          </a>
+          <a href="./mypage.html">
+            내 정보
+          </a>
+          <span data-session-user hidden>
+          </span>
+          <button type="button" data-logout hidden>
+            로그아웃
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="preview-notice">
+      <div class="container">
+        화면 레퍼런스 · 검색, 저장, 로그인, 지도 기능 연결 전
+      </div>
+    </div>
+    <main id="main" class="container">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <span class="eyebrow">
+            ENJOY THE JOURNEY
+          </span>
+          <h1 id="hero-title">
+            가고 싶은 곳을 찾고,
+            <br>
+            나만의 여행을 그리다.
+          </h1>
+          <p class="muted">
+            지역의 매력을 발견하고, 여행 계획을 세우고, 나만의 숨은 장소를 기록해 보세요.
+          </p>
+          <div class="actions">
+            <a class="button" href="./attractions.html">
+              여행지 둘러보기
+            </a>
+            <a class="button secondary" href="./plans.html">
+              여행 계획 세우기
+            </a>
+          </div>
+        </div>
+        <img class="hero-art" src="./assets/images/travel-landscape.svg" width="600" height="440" alt="산과 산책길을 표현한 여행 일러스트">
+      </section>
+      <section class="section" aria-labelledby="features-title">
+        <div class="section-heading">
+          <h2 id="features-title">
+            이번 여행, 이렇게 시작해요
+          </h2>
+          <span class="muted">
+            발견 · 계획 · 기록
+          </span>
+        </div>
+        <div class="feature-grid">
+          <a class="panel feature-card" href="./attractions.html">
+            <span class="badge">
+              01 / 발견
+            </span>
+            <h3>
+              취향에 맞는 여행지
+            </h3>
+            <p>
+              지역과 여행 유형으로 원하는 장소를 찾아보세요.
+            </p>
+          </a>
+          <a class="panel feature-card" href="./plans.html">
+            <span class="badge">
+              02 / 계획
+            </span>
+            <h3>
+              나만의 여행 일정
+            </h3>
+            <p>
+              방문 순서와 예산을 정리해 여행을 준비하세요.
+            </p>
+          </a>
+          <a class="panel feature-card" href="./hotplaces.html">
+            <span class="badge">
+              03 / 기록
+            </span>
+            <h3>
+              내가 발견한 Hotplace
+            </h3>
+            <p>
+              사진과 방문 기록으로 특별한 장소를 남겨 보세요.
+            </p>
+          </a>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container row">
+        <p>
+          EnjoyTrip · 우리 손으로 만드는 여행
+        </p>
+        <p>
+          일러스트와 데이터는 학습용 샘플입니다.
+        </p>
+      </div>
+    </footer>
+    <script type="module" src="./js/preview.js">
+    </script>
+    <script type="module" src="./js/common.js">
+    </script>
+  </body>
+</html>

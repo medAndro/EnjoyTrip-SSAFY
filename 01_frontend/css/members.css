@@ -1,0 +1,14 @@
+/* B 담당: 폼 오류 표시, 로그인 상태, 내 정보 편집 스타일을 추가합니다. */
+.auth-layout { display: grid; gap: 28px; max-width: 940px; margin-inline: auto; }
+.auth-story { padding: 28px 10px; }
+.auth-story img { width: min(100%, 330px); border-radius: 16px; }
+.member-form { display: grid; gap: 18px; }
+.member-form .actions { margin-top: 8px; }
+.checkbox-label { display: flex; gap: 10px; align-items: flex-start; }
+.profile-layout { display: grid; gap: 22px; }
+.profile-summary { align-self: start; }
+.avatar { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: #e1edda; font-size: 26px; margin-bottom: 18px; }
+@media (min-width: 800px) {
+  .auth-layout { grid-template-columns: .9fr 1.1fr; }
+  .profile-layout { grid-template-columns: 280px minmax(0, 1fr); }
+}

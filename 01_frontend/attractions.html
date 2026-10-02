@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      여행지 탐색 | EnjoyTrip
+    </title>
+    <link rel="icon" href="./assets/icons/pin.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/attractions.css">
+  </head>
+  <body data-page="attractions">
+    <a class="skip-link" href="#main">
+      본문으로 이동
+    </a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html">
+          <img src="./assets/icons/pin.svg" alt="">
+          EnjoyTrip
+        </a>
+        <nav class="site-nav" aria-label="주 메뉴">
+          <ul>
+            <li>
+              <a href="./attractions.html" aria-current="page">
+                여행지 탐색
+              </a>
+            </li>
+            <li>
+              <a href="./plans.html">
+                여행 계획
+              </a>
+            </li>
+            <li>
+              <a href="./hotplaces.html">
+                Hotplace
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="account-links">
+          <a data-auth-link href="./login.html">
+            로그인
+          </a>
+          <a data-auth-link href="./signup.html">
+            회원가입
+          </a>
+          <a href="./mypage.html">
+            내 정보
+          </a>
+          <span data-session-user hidden>
+          </span>
+          <button type="button" data-logout hidden>
+            로그아웃
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="preview-notice">
+      <div class="container">
+        화면 레퍼런스 · 검색, 저장, 로그인, 지도 기능 연결 전
+      </div>
+    </div>
+    <main id="main" class="container">
+      <div class="page-heading">
+        <span class="eyebrow">
+          EXPLORE
+        </span>
+        <h1>
+          어디로 떠나고 싶으세요?
+        </h1>
+        <p class="muted">
+          지역과 유형을 선택하고 여행지를 찾아보세요.
+        </p>
+      </div>
+      <form id="search-form" class="panel" data-preview-form>
+        <div class="search-grid">
+          <div class="field">
+            <label for="region">
+              지역
+            </label>
+            <select id="region" name="region">
+              <option value="">
+                전체 지역
+              </option>
+              <option value="서울">
+                서울
+              </option>
+              <option value="부산">
+                부산
+              </option>
+              <option value="제주">
+                제주
+              </option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="content-type">
+              여행 유형
+            </label>
+            <select id="content-type" name="content-type">
+              <option value="">
+                전체 유형
+              </option>
+              <option value="12">
+                관광지
+              </option>
+              <option value="32">
+                숙박
+              </option>
+              <option value="39">
+                음식점
+              </option>
+              <option value="14">
+                문화시설
+              </option>
+              <option value="15">
+                공연·행사
+              </option>
+              <option value="25">
+                여행코스
+              </option>
+              <option value="38">
+                쇼핑
+              </option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="keyword">
+              검색어
+            </label>
+            <input id="keyword" name="keyword" type="search" placeholder="관광지 이름을 입력하세요">
+          </div>
+          <button type="submit">
+            검색하기
+          </button>
+        </div>
+        <p class="hint" role="status" aria-live="polite">
+        </p>
+      </form>
+      <div class="explore-grid">
+        <section aria-labelledby="results-title">
+          <div class="section-heading">
+            <h2 id="results-title">
+              여행지 목록
+            </h2>
+            <span id="result-count" class="hint">
+              샘플 배치 3개
+            </span>
+          </div>
+          <p class="hint">
+            가상 데이터로 구성한 화면 예시입니다.
+          </p>
+          <ul id="place-list" class="place-list">
+            <li class="place-card" data-place-id="sample-1-12">
+              <span class="badge">
+                관광지
+              </span>
+              <h3>
+                서울 관광지 샘플
+              </h3>
+              <p class="muted">
+                서울 · 학습용 가상 주소
+              </p>
+              <button type="button" class="secondary" data-action="detail" disabled>
+                상세 보기
+              </button>
+            </li>
+            <li class="place-card" data-place-id="sample-6-12">
+              <span class="badge">
+                관광지
+              </span>
+              <h3>
+                부산 관광지 샘플
+              </h3>
+              <p class="muted">
+                부산 · 학습용 가상 주소
+              </p>
+              <button type="button" class="secondary" data-action="detail" disabled>
+                상세 보기
+              </button>
+            </li>
+            <li class="place-card" data-place-id="sample-39-12">
+              <span class="badge">
+                관광지
+              </span>
+              <h3>
+                제주 관광지 샘플
+              </h3>
+              <p class="muted">
+                제주 · 학습용 가상 주소
+              </p>
+              <button type="button" class="secondary" data-action="detail" disabled>
+                상세 보기
+              </button>
+            </li>
+          </ul>
+          <p id="search-status" role="status" aria-live="polite">
+          </p>
+        </section>
+        <section class="panel" aria-labelledby="map-title">
+          <h2 id="map-title">
+            여행지 지도
+          </h2>
+          <div id="map" class="map-placeholder">
+            <img src="./assets/icons/pin.svg" alt="">
+            <strong>
+              여행의 위치를 한눈에
+            </strong>
+            <span class="hint">
+              지도 표시 영역 · 실제 지도 연결 전
+            </span>
+          </div>
+          <p class="hint">
+            목록과 지도에 같은 검색 결과를 표시하는 공간입니다.
+          </p>
+        </section>
+      </div>
+      <template id="place-card-template">
+        <li class="place-card">
+          <span class="badge" data-field="type">
+          </span>
+          <h3 data-field="name">
+          </h3>
+          <p class="muted" data-field="address">
+          </p>
+          <button type="button" class="secondary" data-action="detail">
+            상세 보기
+          </button>
+        </li>
+      </template>
+      <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title">
+        <h2 id="detail-title">
+          관광지 상세
+        </h2>
+        <p id="detail-description">
+        </p>
+        <p id="detail-address">
+        </p>
+        <p id="detail-source" class="hint">
+        </p>
+        <div class="actions">
+          <button type="button" id="add-to-plan" disabled>
+            일정에 추가
+          </button>
+          <button type="button" id="close-detail" class="secondary" disabled>
+            닫기
+          </button>
+        </div>
+      </dialog>
+    </main>
+    <footer class="site-footer">
+      <div class="container row">
+        <p>
+          EnjoyTrip · 우리 손으로 만드는 여행
+        </p>
+        <p>
+          일러스트와 데이터는 학습용 샘플입니다.
+        </p>
+      </div>
+    </footer>
+    <script type="module" src="./js/preview.js">
+    </script>
+    <script type="module" src="./js/common.js">
+    </script>
+    <script type="module" src="./js/attractions.js">
+    </script>
+  </body>
+</html>

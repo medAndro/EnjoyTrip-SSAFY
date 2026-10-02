@@ -19,7 +19,7 @@ AGENTS.md
 .env.*
 !.env.example
 !.env.*.example
-key.js
+01_frontend/js/keys.js
 
 # 로그 및 임시 파일
 *.log

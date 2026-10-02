@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Hotplace 기록 | EnjoyTrip
+    </title>
+    <link rel="icon" href="./assets/icons/pin.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/hotplaces.css">
+    <link rel="stylesheet" href="./css/attractions.css">
+  </head>
+  <body data-page="hotplaces">
+    <a class="skip-link" href="#main">
+      본문으로 이동
+    </a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html">
+          <img src="./assets/icons/pin.svg" alt="">
+          EnjoyTrip
+        </a>
+        <nav class="site-nav" aria-label="주 메뉴">
+          <ul>
+            <li>
+              <a href="./attractions.html">
+                여행지 탐색
+              </a>
+            </li>
+            <li>
+              <a href="./plans.html">
+                여행 계획
+              </a>
+            </li>
+            <li>
+              <a href="./hotplaces.html" aria-current="page">
+                Hotplace
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="account-links">
+          <a data-auth-link href="./login.html">
+            로그인
+          </a>
+          <a data-auth-link href="./signup.html">
+            회원가입
+          </a>
+          <a href="./mypage.html">
+            내 정보
+          </a>
+          <span data-session-user hidden>
+          </span>
+          <button type="button" data-logout hidden>
+            로그아웃
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="preview-notice">
+      <div class="container">
+        화면 레퍼런스 · 검색, 저장, 로그인, 지도 기능 연결 전
+      </div>
+    </div>
+    <main id="main" class="container">
+      <div class="page-heading">
+        <span class="eyebrow">
+          SAVE YOUR MOMENTS
+        </span>
+        <h1>
+          나만 알고 싶은 그 장소
+        </h1>
+        <p class="muted">
+          사진과 방문 기록으로 특별한 장소를 소개하세요.
+        </p>
+      </div>
+      <div class="hotplace-layout">
+        <section class="panel" aria-labelledby="hotplace-form-title">
+          <h2 id="hotplace-form-title">
+            새 장소 등록
+          </h2>
+          <form id="hotplace-form" class="member-form" data-preview-form>
+            <div class="field">
+              <label for="place-name">
+                장소 이름
+              </label>
+              <input id="place-name" name="place-name" type="text" required maxlength="60">
+            </div>
+            <div class="field">
+              <label for="address">
+                주소
+              </label>
+              <input id="address" name="address" type="text" required>
+            </div>
+            <div class="field">
+              <label for="place-type">
+                장소 유형
+              </label>
+              <select id="place-type" name="place-type">
+                <option value="12">
+                  관광지
+                </option>
+                <option value="32">
+                  숙박
+                </option>
+                <option value="39">
+                  음식점
+                </option>
+                <option value="14">
+                  문화시설
+                </option>
+                <option value="15">
+                  공연·행사
+                </option>
+                <option value="25">
+                  여행코스
+                </option>
+                <option value="38">
+                  쇼핑
+                </option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="visited-date">
+                다녀온 날짜
+              </label>
+              <input id="visited-date" name="visited-date" type="date" required>
+            </div>
+            <div class="field">
+              <label for="photo">
+                내가 찍은 사진
+              </label>
+              <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required>
+            </div>
+            <p class="hint">
+              5MB 이하 JPG·PNG·WEBP 사진을 선택하세요.
+            </p>
+            <div id="photo-preview" class="photo-preview">
+              사진 미리보기 영역
+            </div>
+            <div class="field">
+              <label for="description">
+                장소 소개
+              </label>
+              <textarea id="description" name="description" maxlength="1000"></textarea>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label for="latitude">
+                  위도
+                </label>
+                <input id="latitude" name="latitude" type="number" required min="-90" max="90" step="any">
+              </div>
+              <div class="field">
+                <label for="longitude">
+                  경도
+                </label>
+                <input id="longitude" name="longitude" type="number" required min="-180" max="180" step="any">
+              </div>
+            </div>
+            <p class="hint">
+              3시간 기본안에서는 위도·경도를 직접 입력합니다. 회원당 최대 3개를 등록합니다.
+            </p>
+            <p class="hint" role="status" aria-live="polite">
+            </p>
+            <button type="submit">
+              장소 등록
+            </button>
+          </form>
+        </section>
+        <div class="stack">
+          <section class="panel">
+            <h2>
+              장소 위치
+            </h2>
+            <div id="hotplace-map" class="map-placeholder">
+              <img src="./assets/icons/pin.svg" alt="">
+              <strong>
+                여행의 위치를 한눈에
+              </strong>
+              <span class="hint">
+                지도 표시 영역 · 실제 지도 연결 전
+              </span>
+            </div>
+          </section>
+          <section class="panel" aria-labelledby="my-hotplaces-title">
+            <h2 id="my-hotplaces-title">
+              나의 Hotplace
+            </h2>
+            <div id="hotplace-list" class="hotplace-list">
+              <p class="empty-state">
+                등록한 사진과 장소를 표시할 공간입니다.
+              </p>
+            </div>
+            <p id="hotplace-status" role="status" aria-live="polite">
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="container row">
+        <p>
+          EnjoyTrip · 우리 손으로 만드는 여행
+        </p>
+        <p>
+          일러스트와 데이터는 학습용 샘플입니다.
+        </p>
+      </div>
+    </footer>
+    <script type="module" src="./js/preview.js">
+    </script>
+    <script type="module" src="./js/common.js">
+    </script>
+    <script type="module" src="./js/hotplaces.js">
+    </script>
+  </body>
+</html>

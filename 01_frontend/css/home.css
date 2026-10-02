@@ -1,0 +1,14 @@
+/* A 담당: hero 배치와 모바일 전환 원리를 읽고 직접 개선하세요. */
+.hero { display: grid; gap: 32px; align-items: center; }
+.hero-copy { padding-block: 28px; }
+.hero h1 { font-size: clamp(36px, 5vw, 60px); }
+.hero-copy p { max-width: 470px; }
+.hero-art { width: 100%; border-radius: 24px; border: 1px solid var(--line); }
+.feature-grid { display: grid; gap: 20px; }
+.feature-card { display: block; }
+.feature-card .badge { margin-bottom: 14px; }
+.feature-card p { margin-bottom: 0; color: var(--muted); }
+@media (min-width: 800px) {
+  .hero { grid-template-columns: 1.05fr 1fr; }
+  .feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

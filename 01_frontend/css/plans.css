@@ -1,0 +1,7 @@
+/* A 담당: 일정 추가/삭제/순서 변경/드래그 중 상태를 꾸며 보세요. */
+.planner-layout { display: grid; gap: 24px; }
+.schedule-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.schedule-item { padding: 18px; border: 1px solid var(--line); border-radius: 12px; }
+.schedule-item h3 { margin-block: 8px; }
+.plan-total { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+@media (min-width: 900px) { .planner-layout { grid-template-columns: 320px minmax(0, 1fr); } }

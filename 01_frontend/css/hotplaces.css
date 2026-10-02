@@ -1,0 +1,6 @@
+/* B 담당: 사진 미리보기, 등록 목록, 카드 상세 상태를 추가합니다. */
+.hotplace-layout { display: grid; gap: 24px; }
+.photo-preview { width: 100%; min-height: 210px; background: #edf1e8; border: 1px dashed #b9c9c0; border-radius: 12px; display: grid; place-content: center; text-align: center; }
+.photo-preview img { max-width: 100%; max-height: 300px; object-fit: contain; }
+.hotplace-list { display: grid; gap: 16px; }
+@media (min-width: 900px) { .hotplace-layout { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); } }

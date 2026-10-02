@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      여행 계획 | EnjoyTrip
+    </title>
+    <link rel="icon" href="./assets/icons/pin.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./css/common.css">
+    <link rel="stylesheet" href="./css/plans.css">
+    <link rel="stylesheet" href="./css/attractions.css">
+  </head>
+  <body data-page="plans">
+    <a class="skip-link" href="#main">
+      본문으로 이동
+    </a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./index.html">
+          <img src="./assets/icons/pin.svg" alt="">
+          EnjoyTrip
+        </a>
+        <nav class="site-nav" aria-label="주 메뉴">
+          <ul>
+            <li>
+              <a href="./attractions.html">
+                여행지 탐색
+              </a>
+            </li>
+            <li>
+              <a href="./plans.html" aria-current="page">
+                여행 계획
+              </a>
+            </li>
+            <li>
+              <a href="./hotplaces.html">
+                Hotplace
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="account-links">
+          <a data-auth-link href="./login.html">
+            로그인
+          </a>
+          <a data-auth-link href="./signup.html">
+            회원가입
+          </a>
+          <a href="./mypage.html">
+            내 정보
+          </a>
+          <span data-session-user hidden>
+          </span>
+          <button type="button" data-logout hidden>
+            로그아웃
+          </button>
+        </div>
+      </div>
+    </header>
+    <div class="preview-notice">
+      <div class="container">
+        화면 레퍼런스 · 검색, 저장, 로그인, 지도 기능 연결 전
+      </div>
+    </div>
+    <main id="main" class="container">
+      <div class="page-heading">
+        <span class="eyebrow">
+          PLAN YOUR TRIP
+        </span>
+        <h1>
+          나의 여행을 차곡차곡
+        </h1>
+        <p class="muted">
+          방문 순서부터 여행 경비까지 한곳에 정리하세요.
+        </p>
+      </div>
+      <div class="planner-layout">
+        <aside class="stack">
+          <section class="panel" aria-labelledby="saved-title">
+            <h2 id="saved-title">
+              나의 여행 계획
+            </h2>
+            <ul id="saved-plan-list" class="place-list">
+            </ul>
+            <p class="hint">
+              회원당 한 개의 계획을 저장하고 다시 불러옵니다.
+            </p>
+          </section>
+          <section class="panel">
+            <h2>
+              여행지 더하기
+            </h2>
+            <p class="hint">
+              관광지 상세에서 여행지 ID를 받아 일정에 추가합니다.
+            </p>
+            <a class="button secondary" href="./attractions.html">
+              여행지 탐색
+            </a>
+          </section>
+        </aside>
+        <div class="stack">
+          <section class="panel" aria-labelledby="plan-title-heading">
+            <h2 id="plan-title-heading">
+              여행 기본 정보
+            </h2>
+            <form id="plan-form" class="member-form" data-preview-form>
+              <div class="field">
+                <label for="plan-title">
+                  여행 제목
+                </label>
+                <input id="plan-title" name="plan-title" type="text" required maxlength="60" placeholder="예: 주말 서울 여행">
+              </div>
+              <div class="field">
+                <label for="start-date">
+                  여행 시작일
+                </label>
+                <input id="start-date" name="start-date" type="date" required>
+              </div>
+              <div class="field">
+                <label for="end-date">
+                  여행 종료일
+                </label>
+                <input id="end-date" name="end-date" type="date" required>
+              </div>
+              <div class="field">
+                <label for="plan-memo">
+                  전체 여행 메모
+                </label>
+                <textarea id="plan-memo" name="plan-memo" maxlength="1000"></textarea>
+              </div>
+              <p class="hint" role="status" aria-live="polite">
+              </p>
+              <div class="actions">
+                <button type="submit">
+                  여행 저장
+                </button>
+                <button type="button" id="delete-plan" class="secondary" disabled>
+                  여행 삭제
+                </button>
+              </div>
+            </form>
+          </section>
+          <section class="panel" aria-labelledby="schedule-title">
+            <div class="section-heading">
+              <h2 id="schedule-title">
+                방문 일정
+              </h2>
+              <span class="badge">
+                순서 배치 예시
+              </span>
+            </div>
+            <ol id="schedule-list" class="schedule-list">
+              <li class="schedule-item" data-sample>
+                <span class="badge">
+                  첫 번째 방문
+                </span>
+                <h3>
+                  서울 관광지 샘플
+                </h3>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="visit-date">
+                      방문일
+                    </label>
+                    <input id="visit-date" name="visit-date" type="date" >
+                  </div>
+                  <div class="field">
+                    <label for="visit-time">
+                      방문 시간
+                    </label>
+                    <input id="visit-time" name="visit-time" type="time" >
+                  </div>
+                  <div class="field">
+                    <label for="cost">
+                      예상 경비 (원)
+                    </label>
+                    <input id="cost" name="cost" type="number" min="0" step="1000" value="10000">
+                  </div>
+                  <div class="field">
+                    <label for="item-memo">
+                      방문 메모
+                    </label>
+                    <input id="item-memo" name="item-memo" type="text" maxlength="200">
+                  </div>
+                </div>
+                <div class="actions section">
+                  <button type="button" class="secondary" disabled>
+                    위로
+                  </button>
+                  <button type="button" class="secondary" disabled>
+                    아래로
+                  </button>
+                  <button type="button" class="secondary" disabled>
+                    제외
+                  </button>
+                </div>
+              </li>
+            </ol>
+            <div class="row plan-total">
+              <strong>
+                총 예상 경비
+              </strong>
+              <span id="total-cost">
+                샘플 10,000원
+              </span>
+            </div>
+          </section>
+          <section class="panel">
+            <h2>
+              방문 위치
+            </h2>
+            <div id="plan-map" class="map-placeholder">
+              <img src="./assets/icons/pin.svg" alt="">
+              <strong>
+                여행의 위치를 한눈에
+              </strong>
+              <span class="hint">
+                지도 표시 영역 · 실제 지도 연결 전
+              </span>
+            </div>
+            <p class="hint">
+              일정 목록의 순서와 방문 위치를 함께 확인합니다. 실제 도로 경로 계산은 후속 범위입니다.
+            </p>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="container row">
+        <p>
+          EnjoyTrip · 우리 손으로 만드는 여행
+        </p>
+        <p>
+          일러스트와 데이터는 학습용 샘플입니다.
+        </p>
+      </div>
+    </footer>
+    <script type="module" src="./js/preview.js">
+    </script>
+    <script type="module" src="./js/common.js">
+    </script>
+    <script type="module" src="./js/plans.js">
+    </script>
+  </body>
+</html>
