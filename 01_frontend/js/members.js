@@ -8,7 +8,7 @@
 // 실제 submit 리스너 연결 시 data-preview-form 속성과 해당 disabled를 제거합니다.
 
 import { readJSON, writeJSON } from "./storage.js";
-import { setSession } from "./session.js";
+import { getCurrentUser, setSession, clearSession } from "./session.js";
 
 const MEMBERS_KEY = "enjoytrip:v1:members";
 
@@ -109,5 +109,101 @@ if(loginform){
   loginform.addEventListener("submit", (event) => {
     event.preventDefault();
     login();
+  });
+}
+
+const profileForm=document.querySelector("#profile-form");
+if(profileForm){
+  const currentUser=getCurrentUser();
+
+  if(!currentUser){
+    alert ("로그인이 필요한 서비스입니다.");
+    location.href="login.html";
+  }else{
+    const inputId = document.querySelector("#user-id");
+    const inputNickname = document.querySelector("#nickname");
+    const inputEmail = document.querySelector("#email");
+
+    const profileNickname = document.querySelector("#profile-nickname");
+    const profileId = document.querySelector("#profile-id");
+
+    const inputPassword = document.querySelector("#password");
+    const inputPassword2 = document.querySelector("#password2");
+
+    //현재 회원 정보 가져와서 뿌리기
+    inputId.value=currentUser.id;
+    inputNickname.value=currentUser.nickname;
+    inputEmail.value=currentUser.email;
+
+    profileNickname.textContent = currentUser.nickname;
+    profileId.textContent = currentUser.id;
+
+    profileForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const members = readJSON(MEMBERS_KEY, []);
+
+      const member = members.find(
+        member => member.id === currentUser.id
+      );
+
+      if (!member) {
+        alert("회원 정보를 찾을 수 없습니다.");
+        return;
+      }
+
+    if (inputPassword.value !== inputPassword2.value) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+      member.password = inputPassword.value;
+      member.nickname = inputNickname.value;
+      member.email = inputEmail.value;
+
+      writeJSON(MEMBERS_KEY, members);
+
+      alert("회원 정보가 수정되었습니다.");
+      location.reload();
+    });
+  }
+
+
+  
+  const withdrawButton = document.querySelector("#withdraw");
+  withdrawButton.addEventListener("click", () => {
+    const confirmed = confirm("정말 탈퇴하시겠습니까?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    const members = readJSON(MEMBERS_KEY, []);
+
+    const newMembers = members.filter(
+      member => member.id !== currentUser.id
+    );
+
+    writeJSON(MEMBERS_KEY, newMembers);
+
+    const plans = readJSON(PLANS_KEY, []);
+
+    const newPlans = plans.filter(
+      plan => plan.ownerId !== currentUser.id
+    );
+
+    writeJSON(PLANS_KEY, newPlans);
+
+    const hotplaces = readJSON(HOTPLACES_KEY, []);
+
+    const newHotplaces = hotplaces.filter(
+      hotplace => hotplace.ownerId !== currentUser.id
+    );
+
+    writeJSON(HOTPLACES_KEY, newHotplaces);
+    
+    clearSession();
+    alert("회원 탈퇴가 완료되었습니다.");
+    location.href = "index.html";
   });
 }
