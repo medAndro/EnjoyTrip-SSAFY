@@ -98,7 +98,7 @@
           <h2 id="profile-title">
             회원 정보
           </h2>
-          <form id="profile-form" class="member-form" data-preview-form>
+          <form id="profile-form" class="member-form">
             <div class="field">
               <label for="user-id">
                 아이디
@@ -113,9 +113,21 @@
             </div>
             <div class="field">
               <label for="email">
-                샘플 이메일
+                이메일
               </label>
               <input id="email" name="email" type="email" required value="demo@example.com">
+            </div>
+            <div class="field">
+              <label for="password">
+                비밀번호
+              </label>
+              <input id="password" name="password" type="password" required minlength="8">
+            </div>
+            <div class="field">
+              <label for="password2">
+                비밀번호 확인
+              </label>
+              <input id="password2" name="password" type="password" required minlength="8">
             </div>
             <p class="hint" role="status" aria-live="polite">
             </p>
@@ -123,12 +135,11 @@
               <button type="submit">
                 변경사항 저장
               </button>
-              <button type="button" id="withdraw" class="secondary" disabled>
+              <button type="button" id="withdraw" class="secondary">
                 회원 탈퇴
               </button>
             </div>
             <p class="hint">
-              로그인 회원을 불러오기 전의 화면 예시입니다.
             </p>
           </form>
         </section>
